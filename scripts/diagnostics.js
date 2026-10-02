@@ -101,6 +101,7 @@ function renderBasicDiagnostics() {
 
             try {
                 report[i] = checkUnmissableNotes(notes);
+                report[i].push(...checkForEndlessSliders(notes));
                 let reportElem = createReportElement(report[i], diffTypeNames[i+2]);
                 mainContainer.append(reportElem);
             }
@@ -225,7 +226,7 @@ function calculateBalance(notesIn, htmlParent) {
     matchElement.classList.add("dv-match-count");
     let tapElement = htmlParent.appendChild(document.createElement("div"));
     tapElement.classList.add("dv-box-content");
-    tapElement.textContent = `Taps: ${nTap}`;
+    tapElement.textContent = `Taps: ${nTap + nSlider}`;
     tapElement.classList.add("dv-tap-count");
     let beatElement = htmlParent.appendChild(document.createElement("div"));
     beatElement.classList.add("dv-box-content");
@@ -286,9 +287,6 @@ function calculateMaxScoreAndCombo (notesIn, htmlParent) {
                             break;
                     }
                     if(over) break;
-                }
-                if (bookmark - notesIn[i].tk == 0) {
-                    console.log("erronous slider at " + notesIn[i].tk / 100000)
                 }
                 tickDuration = BigInt(bookmark)
                         - BigInt(notesIn[i].tk);

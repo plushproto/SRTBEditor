@@ -125,7 +125,7 @@ function checkUnmissableNotes (notes) {
                 if(offsetSeverity < 0) offsetSeverity = 0;
                 report.push({
                     type: "Offset time",
-                    desc: "notes in stack occur at slightly different timings from each other, "
+                    desc: "Notes in stack occur at slightly different timings from each other, "
                         + "which gives them a notable chance of being missed",
                     severity: offsetSeverity,
                     note: stack[0]
@@ -156,7 +156,7 @@ function checkUnmissableNotes (notes) {
                     else if(notes[k].tk - notes[i].tk < 3500) sev = 1; //35ms
                     report.push({
                         type: "Invisible near spin",
-                        desc: "invisible matches can be missed when spinning early",
+                        desc: "Invisible matches can be missed when spinning early",
                         severity: sev,
                         note: stack[0]
                     });
@@ -209,7 +209,7 @@ function checkForMisalign (notes, indices) {
             else testSpread = testSpread * -1 + 0.5;
         }
 
-        let descriptor = getStackHasInvis(stack) ? "invisible" : "offtrack";
+        let descriptor = getStackHasInvis(stack) ? "Invisible" : "Offtrack";
         let stackType = getNumMatchesInStack(stack) == 1 ? "note" : "stack";
 
         let rate = nGood / (nGood + nBad);
@@ -272,7 +272,7 @@ function checkForPerfectMisalign (notes, indices) {
         if(pos.lane == aPoint && pos.spread == 0) {
             return {
                 type: "Perfect misalignment",
-                desc: "stacked matches can be missed by misaligning perfectly, "
+                desc: "Stacked matches can be missed by misaligning perfectly, "
                     + "and the player is almost certain to be in such a position",
                 severity: 3,
                 note: stack[0]
@@ -295,7 +295,7 @@ function checkForPerfectMisalign (notes, indices) {
                 if(Math.abs(drift.drift) < 4) {
                     return {
                         type: "Perfect misalignment",
-                        desc: "stacked matches can be missed by misaligning perfectly, "
+                        desc: "Stacked matches can be missed by misaligning perfectly, "
                             + "and the player could potentially be in such a position",
                         severity: 2,
                         note: stack[0]
@@ -305,7 +305,7 @@ function checkForPerfectMisalign (notes, indices) {
                         || drift.drift - drift.rightAmbiguity <= 4)) {
                     return {
                         type: "Perfect misalignment",
-                        desc: "stacked matches can be missed by misaligning perfectly, "
+                        desc: "Stacked matches can be missed by misaligning perfectly, "
                             + "and the player could potentially be in such a position "
                             + "depending on how they handle color-swaps",
                         severity: 2,
@@ -316,7 +316,7 @@ function checkForPerfectMisalign (notes, indices) {
                         || drift.drift - drift.rightAmbiguity <= 4) {
                     return {
                         type: "Perfect misalignment",
-                        desc: "stacked matches can be missed by misaligning perfectly, "
+                        desc: "Stacked matches can be missed by misaligning perfectly, "
                             + "and the player could potentially be in such a position "
                             + "if they handle movement in an unusual way",
                         severity: 1,
@@ -327,11 +327,29 @@ function checkForPerfectMisalign (notes, indices) {
             else if(!getStackHasVis(stack))
                 return {
                     type: "Perfect misalignment",
-                    desc: "stacked matches can be missed by misaligning perfectly, "
+                    desc: "Stacked matches can be missed by misaligning perfectly, "
                         + "but the player shouldn't be in such a position",
                     severity: 0,
                     note: stack[0]
                 };
         }
     }
+}
+
+function checkForEndlessSliders (notes) {
+    let report = [];
+    //ensure the right encoding
+    for(let i = 0; i < notes.length; i++) {
+        if(notes[i].tp == 4) {
+            if(!doesSliderHaveEndpoint(notes, i)) {
+                report.push({
+                    type: "Slider with no endpoint",
+                    desc: "This slider reduces score and results in a bugged combo",
+                    severity: 3,
+                    note: notes[i]
+                });
+            }
+        }
+    }
+    return report;
 }
